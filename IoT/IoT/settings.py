@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'iotapp.apps.IotappConfig',
     'corsheaders',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -71,7 +72,7 @@ TEMPLATES = [
         },
     },
 ]
-
+MEDIA_ROOT = '%s/iotapp/static/' % BASE_DIR
 WSGI_APPLICATION = 'IoT.wsgi.application'
 
 
