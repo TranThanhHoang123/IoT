@@ -268,7 +268,7 @@ class MachineCategoryViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.
             serializer = MachineCategoryDetailSerializer(category)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Http404:
-            return Response({"error": f"Không tìm thấy đối tượng có id: {kwargs.get("pk")}"},
+            return Response({"error": f"Không tìm thấy machine category"},
                             status=status.HTTP_404_NOT_FOUND)
 
     # lấy danh sách machine thuộc machine category
