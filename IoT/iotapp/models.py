@@ -33,8 +33,6 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     first_name = None  # Không sử dụng trường first_name của AbstractUser
     last_name = None  # Không sử dụng trường last_name của AbstractUser
-    city = models.CharField(max_length=15, blank=True, null=True)
-    district = models.CharField(max_length=20, blank=True, null=True)
     address = models.CharField(max_length=50, blank=True, null=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
     image = models.ImageField(upload_to='User/%Y/%m', blank=True, null=True)
@@ -67,10 +65,13 @@ class MachineParameter(BaseModel):
         (INPUT, 'Input'),
         (OUTPUT, 'Output'),
     ]
-    name = models.CharField(max_length=30, unique = True)  # Tên tham số, kiểu chuỗi
+    name = models.CharField(max_length=30)  # Tên tham số, kiểu chuỗi
     unit_of_measurement = models.CharField(max_length=10)  # Đơn vị đo lường, kiểu chuỗi
     type = models.CharField(max_length=6, choices=PARAMETER_TYPES, default=INPUT)  # Loại tham số: đầu vào hoặc đầu ra
     max_value = models.FloatField(null=True)  # Mức tối đa cho chỉ số
+
+    class Meta:
+        unique_together = ('name', 'unit_of_measurement','type')
 
     def __str__(self):
         return f"{self.name} ({self.unit_of_measurement})"
@@ -91,6 +92,8 @@ class MachineParameterValue(BaseModel):
 class Operation(BaseModel):
     name = models.CharField(max_length=30)
     manager = models.ForeignKey('User', on_delete=models.SET_NULL,null=True,blank=True, related_name='operations') # Một operation có một manager hoặc không khi User bị xóa thì manager = null User có thể truy vấn Operation thông qua related_name = operations
+    city = models.CharField(max_length=15, blank=True, null=True)
+    district = models.CharField(max_length=20, blank=True, null=True)
     address = models.CharField(max_length=180, blank=True, null=True)
 
     def __str__(self):
