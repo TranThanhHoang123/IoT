@@ -165,8 +165,7 @@ class MachineParameterViewSet(viewsets.ViewSet, generics.CreateAPIView, generics
             serializer = MachineParameterDetailSerializer(parameter)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Http404:
-            return Response({"error": f"Không tìm thấy parameter có id: {kwargs.get('pk')}"},
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": f"Không tìm thấy parameter"},status=status.HTTP_404_NOT_FOUND)
 
 
 # View tạo,sửa,xóa MachineCategory và lấy detail của MachineCategory
