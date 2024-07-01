@@ -38,6 +38,7 @@ class User(AbstractUser):
     image = models.ImageField(upload_to='User/%Y/%m', blank=True, null=True)
     email = models.CharField(max_length=30, blank=True, null=True)
     name = models.CharField(max_length=150, null=True)# tên của khách hàng thuê
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -81,7 +82,7 @@ class MachineParameterValue(BaseModel):
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE)  # Khóa ngoại tới Machine, khi Machine bị xóa thì dòng này cũng bị xóa
     parameter = models.ForeignKey(MachineParameter, on_delete=models.CASCADE)  # Khóa ngoại tới MachineParameter, khi MachineParameter bị xóa thì dòng này cũng bị xóa
     value = models.FloatField(null=True)  # Giá trị của tham số
-
+    updated_history_date = models.DateTimeField(null=True)
     class Meta:
         unique_together = ('machine', 'parameter')  # Đảm bảo mỗi máy chỉ có một giá trị cho mỗi tham số
 
@@ -98,3 +99,22 @@ class Operation(BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class MachineParameterValueHistory(models.Model):
+    machine_ip = models.CharField(max_length=16)
+    machine_name = models.CharField(max_length=40)
+    parameter_name = models.CharField(max_length=30)
+    unit_of_measurement = models.CharField(max_length=10)
+    old_value = models.FloatField(null=True)
+    new_value = models.FloatField(null=True)
+    changed_date = models.DateTimeField(auto_now_add=True)
+    ACTIVITY_LEVELS = [
+        ('Normal', 'Bình thường'),
+        ('Warning', 'Cảnh báo'),
+        ('Critical', 'Nguy hiểm'),
+    ]
+    activity_level = models.CharField(max_length=10, choices=ACTIVITY_LEVELS, default='Normal')
+
+    def __str__(self):
+        return f"History of {self.machine_name}({self.ip_machine})({self.parameter_name}) from {self.old_value} to {self.new_value} on {self.changed_date}"

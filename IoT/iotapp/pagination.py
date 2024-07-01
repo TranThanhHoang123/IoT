@@ -24,3 +24,6 @@ class MachineParameterPaginator(pagination.PageNumberPagination):
 
 class RolePaginator(pagination.PageNumberPagination):
     page_size = 5
+
+class HistoryDataPaginator(pagination.PageNumberPagination):
+    page_size = 30

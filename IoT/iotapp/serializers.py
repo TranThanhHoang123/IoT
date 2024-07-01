@@ -35,7 +35,7 @@ class MachineParameterSerializer(serializers.ModelSerializer):
 class MachineParameterListSerializer(serializers.ModelSerializer):
     class Meta:
         model = MachineParameter
-        exclude = ['active', 'max_value', 'type']
+        exclude = ['active', 'max_value']
 
 
 # MachineCategorySerializer dùng để lấy list của parameter
@@ -111,7 +111,7 @@ class MachineListSerializer(serializers.ModelSerializer):
 # tạo, chỉnh sửa vai trò
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Role
         fields = ['id', 'name']
 
 
@@ -155,7 +155,7 @@ class UserListSerializer(UserDetailSerializer):
     role = RoleSerializer()
 
     class Meta(UserDetailSerializer.Meta):
-        fields = ['id', 'name', 'email', 'image']
+        fields = ['id', 'name', 'email', 'image','phone_number','created_date']
 
 
 # thêm,sửa Nhà máy
@@ -163,6 +163,17 @@ class OperationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation
         fields = ['id', 'name', 'manager', 'city', 'district', 'address']
+
+#lấy chi tiết operration
+class OperationDetailSerializer(serializers.ModelSerializer):
+    manager_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Operation
+        fields = ['address', 'city', 'district', 'manager_name']
+
+    def get_manager_name(self, obj):
+        return obj.manager.name
 
 
 # tạo sửa giá trị thông số
@@ -178,22 +189,32 @@ class MachineParameterValueListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MachineParameterValue
-        fields = ['id', 'parameter', 'value']
+        fields = ['parameter', 'value']
+
     def get_parameter(self, obj):
         return {
-            'id': obj.parameter.id,
             'name': obj.parameter.name,
-            'unit_of_measurement': obj.parameter.unit_of_measurement
+            'unit_of_measurement': obj.parameter.unit_of_measurement,
+            'max_value': obj.parameter.max_value
         }
 
 
+# hiển thị danh sách máy kèm danh sách thống số giá trị của máy
 class MachineValueSerializer(serializers.ModelSerializer):
     parameters = serializers.SerializerMethodField()
+    operation = OperationDetailSerializer()
 
     class Meta:
         model = Machine
-        fields = ['ip','id', 'name', 'parameters']
+        fields = ['ip', 'id', 'name', 'operation', 'parameters']
 
     def get_parameters(self, obj):
         parameter_values = MachineParameterValue.objects.filter(machine=obj)
         return MachineParameterValueListSerializer(parameter_values, many=True).data
+
+
+# hiển thị danh sách tất cả các danh sách lịch sử hoạt động của lịch sử hoạt động
+class MachineParameterValueHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MachineParameterValueHistory
+        exclude = ['id']
